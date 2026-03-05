@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Payroll Management{% endblock %}
+
+{% block content %}
+<div class="mt-4">
+    <h2>Payroll Records</h2>
+    <hr>
+    <a href="{% url 'add_salary' %}" class="btn btn-primary mb-3">Process New Salary</a>
+    <table class="table table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Bonus</th>
+            <th>Date</th>
+            <th>Actions</th> </tr>
+    </thead>
+    <tbody>
+        {% for s in salaries %}
+        <tr>
+            <td>{{ s.employee.emp_name }}</td>
+            <td>{{ s.amount }}</td>
+            <td>{{ s.bonus }}</td>
+            <td>{{ s.pay_date }}</td>
+            <td>
+                <a href="{% url 'edit_salary' s.pk %}" class="btn btn-warning btn-sm">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}
