@@ -109,3 +109,13 @@ STATIC_URL = 'static/'
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
+
+
+# Keep the session alive even after the browser is closed
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Set the session age (in seconds). 31,536,000 seconds = 1 Year
+SESSION_COOKIE_AGE = 31536000 
+
+# This ensures the 'last activity' is updated so the year starts over every time they use it
+SESSION_SAVE_EVERY_REQUEST = True

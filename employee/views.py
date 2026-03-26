@@ -60,7 +60,7 @@ def create_emp(request):
         if emp_id and emp_name and emp_dept:
             Employee.objects.create(emp_id=emp_id, emp_name=emp_name, emp_dept=emp_dept)
             messages.success(request, f"Employee {emp_name} has been added successfully!")
-        return redirect('/')
+        return redirect('home')
     return render(request, 'create.html')
 
 def update_view(request, id):
@@ -74,7 +74,7 @@ def update_emp(request, id):
         employee.emp_name = request.POST.get('emp_name', employee.emp_name)
         employee.emp_dept = request.POST.get('emp_dept', employee.emp_dept)
         employee.save()
-        return redirect('/')
+        return redirect('home')
     return render(request, 'update.html', {'employee': employee})
 
 def delete_emp(request, id):
@@ -82,4 +82,4 @@ def delete_emp(request, id):
     name = employee.emp_name
     employee.delete()
     messages.warning(request, f"Employee {name} was deleted successfully!")
-    return redirect('/')
+    return redirect('home')
