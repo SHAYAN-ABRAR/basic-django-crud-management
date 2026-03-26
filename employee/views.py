@@ -57,11 +57,21 @@ def create_emp(request):
         emp_name = request.POST.get('emp_name')
         emp_dept = request.POST.get('emp_dept')
 
-        if emp_id and emp_name and emp_dept:
-            Employee.objects.create(emp_id=emp_id, emp_name=emp_name, emp_dept=emp_dept)
-            messages.success(request, f"Employee {emp_name} added successfully!")
-        return redirect('home')
-    return redirect('create_view')
+        try:
+            # Try to convert the ID to an integer
+            emp_id = int(emp_id) 
+            
+            if emp_id and emp_name and emp_dept:
+                Employee.objects.create(emp_id=emp_id, emp_name=emp_name, emp_dept=emp_dept)
+                messages.success(request, f"Employee {emp_name} added successfully!")
+                return redirect('home')
+        
+        except ValueError:
+            # This catches the "yuio" error
+            messages.error(request, "Error: Employee ID must be a number!")
+            return redirect('create_view')
+
+    return redirect('home')
 
 # 4. Update Views - Good
 @login_required(login_url='login')
