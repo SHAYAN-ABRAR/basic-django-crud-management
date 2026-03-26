@@ -1,16 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Employee
-
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-
 from django.contrib import messages
-
 from django.db.models import Q
 from django.core.paginator import Paginator
 
-#registration
+# 1. Registration - Good as is
 def register_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -22,23 +19,23 @@ def register_view(request):
         form = UserCreationForm()
     return render(request, 'register.html', {'form': form})
 
-
+# 2. Main Home View - FIXED to exclude soft-deleted employees
 @login_required(login_url='login')
-
 def home(request):
     query = request.GET.get('search', '')
     
+    # CRITICAL: Filter by is_deleted=False so "deleted" ones don't show up
+    base_query = Employee.objects.filter(is_deleted=False)
+    
     if query:
-        
-        employee_list = Employee.objects.filter(
+        employee_list = base_query.filter(
             Q(emp_id__icontains=query) | 
             Q(emp_name__icontains=query) | 
             Q(emp_dept__icontains=query)
         ).order_by('-id') 
     else:
-        employee_list = Employee.objects.all().order_by('-id')
+        employee_list = base_query.order_by('-id')
 
-    
     paginator = Paginator(employee_list, 5) 
     page_number = request.GET.get('page')
     employee_obj = paginator.get_page(page_number)
@@ -48,9 +45,12 @@ def home(request):
         'query': query
     })
 
+# 3. Create Views - Good
+@login_required(login_url='login')
 def create_view(request):
     return render(request, 'create.html')
 
+@login_required(login_url='login')
 def create_emp(request):
     if request.method == 'POST':
         emp_id = request.POST.get('emp_id')
@@ -59,14 +59,17 @@ def create_emp(request):
 
         if emp_id and emp_name and emp_dept:
             Employee.objects.create(emp_id=emp_id, emp_name=emp_name, emp_dept=emp_dept)
-            messages.success(request, f"Employee {emp_name} has been added successfully!")
+            messages.success(request, f"Employee {emp_name} added successfully!")
         return redirect('home')
-    return render(request, 'create.html')
+    return redirect('create_view')
 
+# 4. Update Views - Good
+@login_required(login_url='login')
 def update_view(request, id):
     employee = get_object_or_404(Employee, id=id)
     return render(request, 'update.html', {'employee': employee})
 
+@login_required(login_url='login')
 def update_emp(request, id):
     employee = get_object_or_404(Employee, id=id)
     if request.method == 'POST':
@@ -74,12 +77,42 @@ def update_emp(request, id):
         employee.emp_name = request.POST.get('emp_name', employee.emp_name)
         employee.emp_dept = request.POST.get('emp_dept', employee.emp_dept)
         employee.save()
+        messages.success(request, f"Employee {employee.emp_name} updated!")
         return redirect('home')
-    return render(request, 'update.html', {'employee': employee})
+    return redirect('update_view', id=id)
 
+# 5. Soft Delete View - REMOVED DUPLICATE
+@login_required(login_url='login')
 def delete_emp(request, id):
     employee = get_object_or_404(Employee, id=id)
-    name = employee.emp_name
-    employee.delete()
-    messages.warning(request, f"Employee {name} was deleted successfully!")
+    
+    if request.method == "POST":
+        employee.is_deleted = True # Soft delete
+        employee.save()
+        messages.warning(request, f"Employee {employee.emp_name} moved to trash.")
+    
     return redirect('home')
+
+@login_required(login_url='login')
+def trash_view(request):
+    # Filter for ONLY employees marked as deleted
+    deleted_employees = Employee.objects.filter(is_deleted=True).order_by('-id')
+    return render(request, 'trash.html', {'employees': deleted_employees})
+
+@login_required(login_url='login')
+def restore_emp(request, id):
+    employee = get_object_or_404(Employee, id=id)
+    if request.method == "POST":
+        employee.is_deleted = False # The "Restore" magic
+        employee.save()
+        messages.success(request, f"Employee {employee.emp_name} has been restored!")
+    return redirect('trash_view')
+
+@login_required(login_url='login')
+def permanent_delete_emp(request, id):
+    employee = get_object_or_404(Employee, id=id)
+    if request.method == "POST":
+        name = employee.emp_name
+        employee.delete() # This permanently removes it from the DB
+        messages.error(request, f"Employee {name} has been permanently deleted.")
+    return redirect('trash_view')

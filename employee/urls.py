@@ -10,6 +10,10 @@ urlpatterns = [
     path('update/update_emp/<int:id>/', views.update_emp, name='update_emp'),
     path('delete_emp/<int:id>/', views.delete_emp, name='delete_emp'),
 
+    path('trash/', views.trash_view, name='trash_view'),
+    path('restore/<int:id>/', views.restore_emp, name='restore_emp'),
+    path('permanent_delete/<int:id>/', views.permanent_delete_emp, name='permanent_delete'),
+
     # Auth
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),

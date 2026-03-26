@@ -32,6 +32,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'payroll_home' %}">Payroll Records</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-warning" href="{% url 'trash_view' %}">Trash</a>
+                    </li>
                 </ul>
 
                 <form class="form-inline my-0 mx-lg-3" action="{% url 'home' %}" method="GET">

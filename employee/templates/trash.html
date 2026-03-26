@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Trash - Deleted Employees{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Deleted Employees (Trash)</h2>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Active List</a>
+    </div>
+
+    <table class="table table-hover shadow-sm">
+        <thead class="thead-light">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in employees %}
+            <tr>
+                <td>{{ emp.emp_id }}</td>
+                <td>{{ emp.emp_name }}</td>
+                <td>{{ emp.emp_dept }}</td>
+                <td>
+                    <form action="{% url 'restore_emp' emp.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">Restore</button>
+                    </form>
+
+                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal"
+                        data-target="#permDeleteModal{{ emp.id }}">
+                        Delete Permanently
+                    </button>
+
+                    <div class="modal fade" id="permDeleteModal{{ emp.id }}" tabindex="-1"
+                        aria-labelledby="permDeleteLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="permDeleteLabel">Final Warning</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to <strong>permanently delete</strong> {{ emp.emp_name }}?
+                                    <p class="text-danger small mt-2">This action is irreversible. All employee and
+                                        payroll history will be lost.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <form action="{% url 'permanent_delete' emp.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Delete Forever</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">Trash is empty.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
