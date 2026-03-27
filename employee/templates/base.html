@@ -49,6 +49,14 @@
                 </form>
 
                 <ul class="navbar-nav ml-auto align-items-center">
+                    {% if user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-info btn-sm mr-3" href="/admin/" target="_blank">
+                            Open CMS
+                        </a>
+                    </li>
+                    {% endif %}
+
                     <li class="nav-item">
                         <span class="navbar-text mr-3 small">Hi, <strong>{{ user.username }}</strong></span>
                     </li>
