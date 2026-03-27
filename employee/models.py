@@ -1,4 +1,5 @@
 from django.db import models
+from ckeditor.fields import RichTextField
 
 class Employee(models.Model):
     # Fixed: Removed max_length from IntegerField
@@ -8,6 +9,8 @@ class Employee(models.Model):
     
     # Add this for your Soft Delete function
     is_deleted = models.BooleanField(default=False)
+    
+    emp_notes = RichTextField(blank=True, null=True)
 
     def __str__(self):
         return self.emp_name

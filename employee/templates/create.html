@@ -1,29 +1,49 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Add Employee{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mt-5">
-    <div class="col-md-6">
-        <div class="card shadow-sm p-4">
+    <div class="col-md-8"> <div class="card shadow-sm p-4">
             <h2>Add New Employee</h2>
             <form action="{% url 'create_emp' %}" method="post">
                 {% csrf_token %}
+                
                 <div class="form-group">
                     <label>Employee ID</label>
                     <input type="text" name="emp_id" class="form-control" required>
                 </div>
+
                 <div class="form-group">
                     <label>Employee Name</label>
                     <input type="text" name="emp_name" class="form-control" required>
                 </div>
+
                 <div class="form-group">
                     <label>Department</label>
                     <input type="text" name="emp_dept" class="form-control" required>
                 </div>
+
+                <div class="form-group">
+                    <label>Employee Notes / Bio</label>
+                    <textarea name="emp_notes" id="id_emp_notes" class="form-control"></textarea>
+                </div>
+
                 <button type="submit" id="new" class="btn btn-primary w-100">Save Employee</button>
             </form>
-            <a href="{% url 'home' %}" class="btn btn-link mt-2">Back to List</a>
+            <a href="{% url 'home' %}" class="btn btn-link mt-2 text-center">Back to List</a>
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+<script>
+    // This script replaces the standard textarea with the Rich Text Editor
+    CKEDITOR.replace('id_emp_notes', {
+        width: '100%',
+        height: 250
+    });
+</script>
 {% endblock %}

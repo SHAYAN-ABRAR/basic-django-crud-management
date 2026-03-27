@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'employee',
     'payroll',
     'rest_framework',
+    'ckeditor',
     
 ]
 
